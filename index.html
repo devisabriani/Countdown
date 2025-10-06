@@ -16,9 +16,6 @@
       font-family: 'Orbitron', sans-serif;
       overflow: hidden;
       user-select: none;
-    }
-
-    body {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -30,14 +27,22 @@
       max-width: 700px;
       padding: 10px;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     h1 {
       font-size: 4em;
-      margin: 0 10px 20px;
+      margin: 0 10px 10px;
       line-height: 1.1;
       text-shadow: 0 0 25px #00ffff;
-      word-break: keep-all;
+    }
+
+    h1 span {
+      font-size: 0.9em;
     }
 
     @media (max-width: 600px) {
@@ -47,19 +52,17 @@
 
     #timer {
       font-size: 5em;
-      margin: 10px 0 40px;
+      margin: 0 0 20px;
       color: #00ffcc;
       text-shadow: 0 0 25px #00ffcc;
     }
 
     .controls {
-      margin: 10px 0 20px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       max-width: 340px;
-      margin-left: auto;
-      margin-right: auto;
+      gap: 8px;
     }
 
     .controls button {
@@ -68,7 +71,6 @@
       color: white;
       padding: 10px 14px;
       font-size: 1.1em;
-      margin: 4px;
       cursor: pointer;
       border-radius: 10px;
       transition: transform 0.2s;
@@ -85,6 +87,7 @@
       border-radius: 12px;
       cursor: pointer;
       transition: transform 0.2s;
+      margin-top: 10px;
     }
 
     #startBtn:hover { transform: scale(1.1); }
@@ -93,7 +96,8 @@
       position: relative;
       width: 90%;
       max-width: 600px;
-      margin: 30px auto 0;
+      margin-top: 20px;
+      height: auto;
     }
 
     #face, #video {
@@ -133,11 +137,13 @@
 </head>
 <body>
   <div id="container">
-    <h1>💣 Il Vicepreside<br><span style="font-size:0.9em;">si autodistruggerà in...</span></h1>
+    <h1>💣 Il Vicepreside<br><span>si autodistruggerà in...</span></h1>
     <div id="timer">00:05</div>
 
-    <div class="controls" id="controls"></div>
-    <button id="startBtn" onclick="startCountdown()">Avvia Countdown</button>
+    <div id="controlsSection">
+      <div class="controls" id="controls"></div>
+      <button id="startBtn" onclick="startCountdown()">Avvia Countdown</button>
+    </div>
 
     <div id="mediaContainer">
       <img id="face" src="face.png" alt="Il Vicepreside">
@@ -149,15 +155,6 @@
   <button id="restartBtn" onclick="restartCountdown()">↻</button>
 
   <script>
-    // Fix per altezza corretta su mobile
-    function setVh() {
-      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-    }
-    setVh();
-    window.addEventListener('resize', setVh);
-
-    document.body.style.height = 'calc(var(--vh, 1vh) * 100)';
-
     let duration = 5;
     let interval;
 
@@ -185,24 +182,20 @@
     function startCountdown() {
       clearInterval(interval);
       let remaining = duration;
-      const controls = document.getElementById("controls");
-      const startBtn = document.getElementById("startBtn");
+      const controlsSection = document.getElementById("controlsSection");
       const face = document.getElementById("face");
       const video = document.getElementById("video");
       const boom = document.getElementById("boom");
       const restartBtn = document.getElementById("restartBtn");
 
-      controls.style.display = "none";
-      startBtn.style.display = "none";
-      restartBtn.style.display = "none";
-
+      controlsSection.style.display = "none"; // sparisce tutta la sezione con pulsanti
       face.style.display = "block";
       face.style.opacity = "1";
-
       video.pause();
       video.currentTime = 0;
       video.style.display = "none";
       video.style.opacity = "0";
+      restartBtn.style.display = "none";
 
       interval = setInterval(() => {
         updateTimerDisplay(remaining);
@@ -219,15 +212,18 @@
           setTimeout(() => {
             video.style.opacity = "1";
             video.play();
-            setTimeout(() => restartBtn.style.display = "block", 1500);
+
+            // Mostra il pulsante solo a fine video
+            video.onended = () => {
+              restartBtn.style.display = "block";
+            };
           }, 100);
         }
       }, 1000);
     }
 
     function restartCountdown() {
-      const controls = document.getElementById("controls");
-      const startBtn = document.getElementById("startBtn");
+      const controlsSection = document.getElementById("controlsSection");
       const face = document.getElementById("face");
       const video = document.getElementById("video");
       const restartBtn = document.getElementById("restartBtn");
@@ -237,8 +233,7 @@
       face.style.opacity = "0";
       restartBtn.style.display = "none";
 
-      controls.style.display = "flex";
-      startBtn.style.display = "inline-block";
+      controlsSection.style.display = "block";
     }
 
     // Fullscreen su Android
