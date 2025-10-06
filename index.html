@@ -21,7 +21,6 @@
       align-items: center;
     }
 
-    /* Contenitore centrale con scritta, timer e media */
     #centerBlock {
       text-align: center;
       width: 90%;
@@ -55,7 +54,7 @@
       #timer { font-size: 4em; }
     }
 
-    /* Media (foto e video) */
+    /* Media (solo video, con poster) */
     #mediaContainer {
       position: relative;
       width: 100%;
@@ -63,7 +62,7 @@
       aspect-ratio: 16/9;
     }
 
-    #face, #video {
+    #video {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -71,11 +70,11 @@
       object-fit: cover;
       border-radius: 20px;
       box-shadow: 0 0 25px rgba(0,255,255,0.4);
-      transition: opacity 0.8s ease;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      z-index: 2;
+      display: none;
     }
-
-    #face { opacity: 0; display: none; z-index: 1; }
-    #video { opacity: 0; display: none; z-index: 2; }
 
     /* Sezione iniziale con pulsanti e avvio */
     #controlsSection {
@@ -149,8 +148,8 @@
     <div id="timer">00:05</div>
 
     <div id="mediaContainer">
-      <img id="face" src="face.png" alt="Il Vicepreside">
-      <video id="video" src="video.mp4" preload="auto"></video>
+      <!-- poster mostra il primo frame del video -->
+      <video id="video" src="video.mp4" preload="auto" poster="face.png"></video>
     </div>
   </div>
 
@@ -191,26 +190,18 @@
       clearInterval(interval);
       let remaining = duration;
       const controlsSection = document.getElementById("controlsSection");
-      const face = document.getElementById("face");
       const video = document.getElementById("video");
       const boom = document.getElementById("boom");
       const restartBtn = document.getElementById("restartBtn");
 
-      // Nasconde i controlli
       controlsSection.style.display = "none";
-
-      // Mostra la foto
-      face.style.display = "block";
-      face.style.opacity = "1";
-
-      // Reset video
-      video.pause();
-      video.currentTime = 0;
-      video.style.display = "none";
-      video.style.opacity = "0";
       restartBtn.style.display = "none";
 
-      // Countdown
+      video.pause();
+      video.currentTime = 0;
+      video.style.opacity = "1"; // già visibile con poster
+      video.style.display = "block";
+
       interval = setInterval(() => {
         updateTimerDisplay(remaining);
         remaining--;
@@ -222,37 +213,28 @@
           boom.currentTime = 0;
           boom.play().catch(() => {});
 
-          // Dissolvenza immediata della foto + avvio simultaneo del video
-          face.style.opacity = "0";
-          setTimeout(() => {
-            face.style.display = "none";
-            video.style.display = "block";
-            video.style.opacity = "1";
-            video.play();
+          // transizione immediata dal poster al video
+          video.play();
 
-            video.onended = () => {
-              restartBtn.style.display = "block";
-            };
-          }, 400); // sincronizzazione precisa: metà del tempo della dissolvenza
+          video.onended = () => {
+            restartBtn.style.display = "block";
+          };
         }
       }, 1000);
     }
 
     function restartCountdown() {
       const controlsSection = document.getElementById("controlsSection");
-      const face = document.getElementById("face");
       const video = document.getElementById("video");
       const restartBtn = document.getElementById("restartBtn");
 
       video.pause();
       video.style.display = "none";
-      face.style.opacity = "0";
-      face.style.display = "none";
       restartBtn.style.display = "none";
+
       controlsSection.style.display = "block";
     }
 
-    // Fullscreen su Android
     document.body.addEventListener('click', () => {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
