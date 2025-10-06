@@ -21,7 +21,6 @@
       align-items: center;
     }
 
-    /* Contenitore centrale con scritta, timer e media */
     #centerBlock {
       text-align: center;
       width: 90%;
@@ -40,9 +39,7 @@
       text-shadow: 0 0 25px #00ffff;
     }
 
-    h1 span {
-      font-size: 0.9em;
-    }
+    h1 span { font-size: 0.9em; }
 
     #timer {
       font-size: 5em;
@@ -63,23 +60,35 @@
     }
 
     #face, #video {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: auto;
       border-radius: 20px;
       box-shadow: 0 0 25px rgba(0,255,255,0.4);
-      transition: opacity 1s ease;
+      transition: opacity 0.8s ease;
     }
 
-    #face { opacity: 0; display: none; }
-    #video { opacity: 0; display: none; }
+    #face {
+      opacity: 0;
+      display: none;
+      z-index: 1;
+    }
 
-    /* Sezione iniziale con pulsanti e avvio */
+    #video {
+      opacity: 0;
+      display: none;
+      z-index: 2;
+    }
+
+    /* Sezione iniziale (minutaggio + avvio) */
     #controlsSection {
-      position: absolute;
-      bottom: 5%;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
     }
 
     .controls {
@@ -148,11 +157,11 @@
       <img id="face" src="face.png" alt="Il Vicepreside">
       <video id="video" src="video.mp4" preload="auto"></video>
     </div>
-  </div>
 
-  <div id="controlsSection">
-    <div class="controls" id="controls"></div>
-    <button id="startBtn" onclick="startCountdown()">Avvia Countdown</button>
+    <div id="controlsSection">
+      <div class="controls" id="controls"></div>
+      <button id="startBtn" onclick="startCountdown()">Avvia Countdown</button>
+    </div>
   </div>
 
   <audio id="boom" src="boom.mp3" preload="auto"></audio>
@@ -192,20 +201,15 @@
       const boom = document.getElementById("boom");
       const restartBtn = document.getElementById("restartBtn");
 
-      // Nasconde i controlli
       controlsSection.style.display = "none";
-
-      // Mostra l’immagine al centro
       face.style.display = "block";
       face.style.opacity = "1";
-
       video.pause();
       video.currentTime = 0;
       video.style.display = "none";
       video.style.opacity = "0";
       restartBtn.style.display = "none";
 
-      // Countdown
       interval = setInterval(() => {
         updateTimerDisplay(remaining);
         remaining--;
@@ -214,20 +218,23 @@
           clearInterval(interval);
           document.getElementById("timer").textContent = "00:00";
 
+          // effetto esplosione + dissolvenza immagine
           boom.currentTime = 0;
           boom.play().catch(() => {});
+          face.style.opacity = "0";
 
-          // Avvia il video sopra la foto
-          video.style.display = "block";
+          // avvia il video solo dopo la dissolvenza completa
           setTimeout(() => {
+            face.style.display = "none";
+            video.style.display = "block";
             video.style.opacity = "1";
             video.play();
 
-            // Mostra pulsante solo alla fine del video
+            // mostra il pulsante solo a fine video
             video.onended = () => {
               restartBtn.style.display = "block";
             };
-          }, 100);
+          }, 900);
         }
       }, 1000);
     }
@@ -240,11 +247,10 @@
 
       video.pause();
       video.style.display = "none";
-      face.style.opacity = "0";
       face.style.display = "none";
       restartBtn.style.display = "none";
 
-      controlsSection.style.display = "block";
+      controlsSection.style.display = "flex";
     }
 
     // Fullscreen su Android
