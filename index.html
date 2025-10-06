@@ -11,28 +11,31 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      width: 100%;
       background: radial-gradient(circle at center, #0a0a23 40%, #000);
       color: white;
       font-family: 'Orbitron', sans-serif;
       overflow: hidden;
       user-select: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    /* blocco centrale fisso */
-    #fixedCenter {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    /* Contenitore centrale con scritta, timer e media */
+    #centerBlock {
       text-align: center;
-      width: 100%;
+      width: 90%;
       max-width: 700px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
     }
 
     h1 {
       font-size: 4em;
-      margin: 0 10px 10px;
+      margin: 0;
       line-height: 1.1;
       text-shadow: 0 0 25px #00ffff;
     }
@@ -43,7 +46,6 @@
 
     #timer {
       font-size: 5em;
-      margin: 10px 0 20px;
       color: #00ffcc;
       text-shadow: 0 0 25px #00ffcc;
     }
@@ -51,6 +53,33 @@
     @media (max-width: 600px) {
       h1 { font-size: 2.3em; }
       #timer { font-size: 4em; }
+    }
+
+    /* Media (foto e video) */
+    #mediaContainer {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    #face, #video {
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0,255,255,0.4);
+      transition: opacity 1s ease;
+    }
+
+    #face { opacity: 0; display: none; }
+    #video { opacity: 0; display: none; }
+
+    /* Sezione iniziale con pulsanti e avvio */
+    #controlsSection {
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
     }
 
     .controls {
@@ -87,28 +116,7 @@
 
     #startBtn:hover { transform: scale(1.1); }
 
-    /* area media separata, sotto */
-    #mediaContainer {
-      position: absolute;
-      top: 70%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 600px;
-      text-align: center;
-    }
-
-    #face, #video {
-      width: 100%;
-      height: auto;
-      border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0,255,255,0.4);
-      transition: opacity 1s ease;
-    }
-
-    #face { opacity: 0; display: none; }
-    #video { opacity: 0; display: none; }
-
+    /* Pulsante restart */
     #restartBtn {
       position: fixed;
       bottom: 16px;
@@ -131,19 +139,20 @@
   </style>
 </head>
 <body>
-  <div id="fixedCenter">
+
+  <div id="centerBlock">
     <h1>💣 Il Vicepreside<br><span>si autodistruggerà in...</span></h1>
     <div id="timer">00:05</div>
 
-    <div id="controlsSection">
-      <div class="controls" id="controls"></div>
-      <button id="startBtn" onclick="startCountdown()">Avvia Countdown</button>
+    <div id="mediaContainer">
+      <img id="face" src="face.png" alt="Il Vicepreside">
+      <video id="video" src="video.mp4" preload="auto"></video>
     </div>
   </div>
 
-  <div id="mediaContainer">
-    <img id="face" src="face.png" alt="Il Vicepreside">
-    <video id="video" src="video.mp4" preload="auto"></video>
+  <div id="controlsSection">
+    <div class="controls" id="controls"></div>
+    <button id="startBtn" onclick="startCountdown()">Avvia Countdown</button>
   </div>
 
   <audio id="boom" src="boom.mp3" preload="auto"></audio>
@@ -183,15 +192,20 @@
       const boom = document.getElementById("boom");
       const restartBtn = document.getElementById("restartBtn");
 
+      // Nasconde i controlli
       controlsSection.style.display = "none";
+
+      // Mostra l’immagine al centro
       face.style.display = "block";
       face.style.opacity = "1";
+
       video.pause();
       video.currentTime = 0;
       video.style.display = "none";
       video.style.opacity = "0";
       restartBtn.style.display = "none";
 
+      // Countdown
       interval = setInterval(() => {
         updateTimerDisplay(remaining);
         remaining--;
@@ -199,14 +213,17 @@
         if (remaining < 0) {
           clearInterval(interval);
           document.getElementById("timer").textContent = "00:00";
+
           boom.currentTime = 0;
           boom.play().catch(() => {});
 
+          // Avvia il video sopra la foto
           video.style.display = "block";
           setTimeout(() => {
             video.style.opacity = "1";
             video.play();
 
+            // Mostra pulsante solo alla fine del video
             video.onended = () => {
               restartBtn.style.display = "block";
             };
@@ -230,7 +247,7 @@
       controlsSection.style.display = "block";
     }
 
-    // Fullscreen per Android
+    // Fullscreen su Android
     document.body.addEventListener('click', () => {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
