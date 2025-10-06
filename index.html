@@ -21,7 +21,8 @@
       align-items: center;
     }
 
-    #main {
+    /* Contenitore centrale con scritta, timer e media */
+    #centerBlock {
       text-align: center;
       width: 90%;
       max-width: 700px;
@@ -38,7 +39,10 @@
       line-height: 1.1;
       text-shadow: 0 0 25px #00ffff;
     }
-    h1 span { font-size: 0.9em; }
+
+    h1 span {
+      font-size: 0.9em;
+    }
 
     #timer {
       font-size: 5em;
@@ -51,13 +55,14 @@
       #timer { font-size: 4em; }
     }
 
-    /* --- media --- */
-    #mediaBox {
+    /* Media (foto e video) */
+    #mediaContainer {
       position: relative;
       width: 100%;
       max-width: 600px;
       aspect-ratio: 16/9;
     }
+
     #face, #video {
       position: absolute;
       inset: 0;
@@ -68,16 +73,19 @@
       box-shadow: 0 0 25px rgba(0,255,255,0.4);
       transition: opacity 0.8s ease;
     }
+
     #face { opacity: 0; display: none; z-index: 1; }
     #video { opacity: 0; display: none; z-index: 2; }
 
-    /* --- sezione iniziale --- */
+    /* Sezione iniziale con pulsanti e avvio */
     #controlsSection {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
     }
+
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -85,6 +93,7 @@
       gap: 8px;
       margin-bottom: 10px;
     }
+
     .controls button {
       background: #ff0040;
       border: none;
@@ -95,6 +104,7 @@
       border-radius: 10px;
       transition: transform 0.2s;
     }
+
     .controls button:hover { transform: scale(1.1); }
 
     #startBtn {
@@ -107,9 +117,10 @@
       cursor: pointer;
       transition: transform 0.2s;
     }
+
     #startBtn:hover { transform: scale(1.1); }
 
-    /* --- restart --- */
+    /* Pulsante restart */
     #restartBtn {
       position: fixed;
       bottom: 16px;
@@ -124,6 +135,7 @@
       display: none;
       transition: background 0.3s ease, transform 0.2s ease;
     }
+
     #restartBtn:hover {
       background: rgba(255,255,255,0.3);
       transform: scale(1.1);
@@ -131,19 +143,20 @@
   </style>
 </head>
 <body>
-  <div id="main">
+
+  <div id="centerBlock">
     <h1>💣 Il Vicepreside<br><span>si autodistruggerà in...</span></h1>
     <div id="timer">00:05</div>
 
-    <div id="mediaBox">
+    <div id="mediaContainer">
       <img id="face" src="face.png" alt="Il Vicepreside">
       <video id="video" src="video.mp4" preload="auto"></video>
     </div>
+  </div>
 
-    <div id="controlsSection">
-      <div class="controls" id="controls"></div>
-      <button id="startBtn" onclick="startCountdown()">Avvia Countdown</button>
-    </div>
+  <div id="controlsSection">
+    <div class="controls" id="controls"></div>
+    <button id="startBtn" onclick="startCountdown()">Avvia Countdown</button>
   </div>
 
   <audio id="boom" src="boom.mp3" preload="auto"></audio>
@@ -183,16 +196,21 @@
       const boom = document.getElementById("boom");
       const restartBtn = document.getElementById("restartBtn");
 
+      // Nasconde i controlli
       controlsSection.style.display = "none";
 
+      // Mostra la foto
       face.style.display = "block";
       face.style.opacity = "1";
+
+      // Reset video
       video.pause();
       video.currentTime = 0;
       video.style.display = "none";
       video.style.opacity = "0";
       restartBtn.style.display = "none";
 
+      // Countdown
       interval = setInterval(() => {
         updateTimerDisplay(remaining);
         remaining--;
@@ -203,9 +221,9 @@
 
           boom.currentTime = 0;
           boom.play().catch(() => {});
-          face.style.opacity = "0";
 
-          // avvia il video solo dopo che la foto è completamente svanita
+          // Dissolvenza immediata della foto + avvio simultaneo del video
+          face.style.opacity = "0";
           setTimeout(() => {
             face.style.display = "none";
             video.style.display = "block";
@@ -215,7 +233,7 @@
             video.onended = () => {
               restartBtn.style.display = "block";
             };
-          }, 800);
+          }, 400); // sincronizzazione precisa: metà del tempo della dissolvenza
         }
       }, 1000);
     }
@@ -228,11 +246,13 @@
 
       video.pause();
       video.style.display = "none";
+      face.style.opacity = "0";
       face.style.display = "none";
       restartBtn.style.display = "none";
-      controlsSection.style.display = "flex";
+      controlsSection.style.display = "block";
     }
 
+    // Fullscreen su Android
     document.body.addEventListener('click', () => {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
