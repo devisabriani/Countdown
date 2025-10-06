@@ -7,19 +7,28 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
     body {
       background: radial-gradient(circle at center, #0a0a23 40%, #000);
       color: white;
       font-family: 'Orbitron', sans-serif;
-      text-align: center;
-      height: 100vh;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       overflow: hidden;
       user-select: none;
-      margin: 0;
+    }
+
+    #container {
+      text-align: center;
+      width: 100%;
+      max-width: 700px;
+      padding: 10px;
+      box-sizing: border-box;
     }
 
     h1 {
@@ -30,7 +39,6 @@
       word-break: keep-all;
     }
 
-    /* Riduce automaticamente su schermi piccoli */
     @media (max-width: 600px) {
       h1 {
         font-size: 2.3em;
@@ -53,6 +61,8 @@
       flex-wrap: wrap;
       justify-content: center;
       max-width: 340px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .controls button {
@@ -90,7 +100,7 @@
       position: relative;
       width: 90%;
       max-width: 600px;
-      margin-top: 30px;
+      margin: 30px auto 0;
     }
 
     #face, #video {
@@ -114,22 +124,44 @@
       z-index: 2;
       display: none;
     }
+
+    #restartBtn {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background: rgba(255,255,255,0.15);
+      color: #00ffff;
+      border: 1px solid #00ffff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 1em;
+      cursor: pointer;
+      display: none;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    #restartBtn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
+  <div id="container">
+    <h1>💣 Il Vicepreside<br><span style="font-size:0.9em;">si autodistruggerà in...</span></h1>
+    <div id="timer">00:05</div>
 
-  <h1>💣 Il Vicepreside<br><span style="font-size:0.9em;">si autodistruggerà in...</span></h1>
-  <div id="timer">00:05</div>
+    <div class="controls" id="controls"></div>
+    <button id="startBtn" onclick="startCountdown()">Avvia Countdown</button>
 
-  <div class="controls" id="controls"></div>
-  <button id="startBtn" onclick="startCountdown()">Avvia Countdown</button>
-
-  <div id="mediaContainer">
-    <img id="face" src="face.png" alt="Il Vicepreside">
-    <video id="video" src="video.mp4" preload="auto"></video>
+    <div id="mediaContainer">
+      <img id="face" src="face.png" alt="Il Vicepreside">
+      <video id="video" src="video.mp4" preload="auto"></video>
+    </div>
   </div>
 
   <audio id="boom" src="boom.mp3" preload="auto"></audio>
+  <button id="restartBtn" onclick="restartCountdown()">↺ Ricomincia</button>
 
   <script>
     let duration = 5;
@@ -164,9 +196,11 @@
       const face = document.getElementById("face");
       const video = document.getElementById("video");
       const boom = document.getElementById("boom");
+      const restartBtn = document.getElementById("restartBtn");
 
       controls.style.display = "none";
       startBtn.style.display = "none";
+      restartBtn.style.display = "none";
 
       face.style.display = "block";
       face.style.opacity = "1";
@@ -184,19 +218,38 @@
           clearInterval(interval);
           document.getElementById("timer").textContent = "00:00";
 
-          // Riproduce boom sonoro e avvia il video sovrapposto
+          // Boom sonoro + video sovrapposto
           boom.currentTime = 0;
           boom.play().catch(() => {});
           video.style.display = "block";
           setTimeout(() => {
             video.style.opacity = "1";
             video.play();
+
+            // Mostra il pulsante di uscita
+            setTimeout(() => restartBtn.style.display = "block", 1500);
           }, 100);
         }
       }, 1000);
     }
 
-    // Fullscreen tap (Android)
+    function restartCountdown() {
+      const controls = document.getElementById("controls");
+      const startBtn = document.getElementById("startBtn");
+      const face = document.getElementById("face");
+      const video = document.getElementById("video");
+      const restartBtn = document.getElementById("restartBtn");
+
+      video.pause();
+      video.style.display = "none";
+      face.style.opacity = "0";
+      restartBtn.style.display = "none";
+
+      controls.style.display = "flex";
+      startBtn.style.display = "inline-block";
+    }
+
+    // Fullscreen su Android
     document.body.addEventListener('click', () => {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
