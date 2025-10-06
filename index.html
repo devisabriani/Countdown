@@ -8,19 +8,20 @@
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 
     html, body {
-      height: 100%;
       margin: 0;
-    }
-
-    body {
+      padding: 0;
+      height: 100%;
       background: radial-gradient(circle at center, #0a0a23 40%, #000);
       color: white;
       font-family: 'Orbitron', sans-serif;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    body {
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
-      user-select: none;
     }
 
     #container {
@@ -40,12 +41,8 @@
     }
 
     @media (max-width: 600px) {
-      h1 {
-        font-size: 2.3em;
-      }
-      #timer {
-        font-size: 4em;
-      }
+      h1 { font-size: 2.3em; }
+      #timer { font-size: 4em; }
     }
 
     #timer {
@@ -77,9 +74,7 @@
       transition: transform 0.2s;
     }
 
-    .controls button:hover {
-      transform: scale(1.1);
-    }
+    .controls button:hover { transform: scale(1.1); }
 
     #startBtn {
       background: #0099ff;
@@ -92,9 +87,7 @@
       transition: transform 0.2s;
     }
 
-    #startBtn:hover {
-      transform: scale(1.1);
-    }
+    #startBtn:hover { transform: scale(1.1); }
 
     #mediaContainer {
       position: relative;
@@ -114,27 +107,19 @@
       transition: opacity 1s ease;
     }
 
-    #face {
-      opacity: 0;
-      z-index: 1;
-    }
-
-    #video {
-      opacity: 0;
-      z-index: 2;
-      display: none;
-    }
+    #face { opacity: 0; z-index: 1; }
+    #video { opacity: 0; z-index: 2; display: none; }
 
     #restartBtn {
       position: fixed;
-      bottom: 15px;
-      right: 15px;
-      background: rgba(255,255,255,0.15);
+      bottom: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.1);
       color: #00ffff;
       border: 1px solid #00ffff;
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 1em;
+      border-radius: 50%;
+      padding: 8px 10px;
+      font-size: 1.6em;
       cursor: pointer;
       display: none;
       transition: background 0.3s ease, transform 0.2s ease;
@@ -142,7 +127,7 @@
 
     #restartBtn:hover {
       background: rgba(255,255,255,0.3);
-      transform: scale(1.05);
+      transform: scale(1.1);
     }
   </style>
 </head>
@@ -161,9 +146,18 @@
   </div>
 
   <audio id="boom" src="boom.mp3" preload="auto"></audio>
-  <button id="restartBtn" onclick="restartCountdown()">↺ Ricomincia</button>
+  <button id="restartBtn" onclick="restartCountdown()">↻</button>
 
   <script>
+    // Fix per altezza corretta su mobile
+    function setVh() {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    }
+    setVh();
+    window.addEventListener('resize', setVh);
+
+    document.body.style.height = 'calc(var(--vh, 1vh) * 100)';
+
     let duration = 5;
     let interval;
 
@@ -218,15 +212,13 @@
           clearInterval(interval);
           document.getElementById("timer").textContent = "00:00";
 
-          // Boom sonoro + video sovrapposto
           boom.currentTime = 0;
           boom.play().catch(() => {});
+
           video.style.display = "block";
           setTimeout(() => {
             video.style.opacity = "1";
             video.play();
-
-            // Mostra il pulsante di uscita
             setTimeout(() => restartBtn.style.display = "block", 1500);
           }, 100);
         }
