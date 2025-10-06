@@ -23,10 +23,21 @@
     }
 
     h1 {
-      font-size: 5em;  /* molto più grande */
+      font-size: 4em;
       margin: 0 10px 20px;
       line-height: 1.1;
       text-shadow: 0 0 25px #00ffff;
+      word-break: keep-all;
+    }
+
+    /* Riduce automaticamente su schermi piccoli */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.3em;
+      }
+      #timer {
+        font-size: 4em;
+      }
     }
 
     #timer {
@@ -75,7 +86,6 @@
       transform: scale(1.1);
     }
 
-    /* Contenitore media sovrapposto */
     #mediaContainer {
       position: relative;
       width: 90%;
@@ -108,7 +118,7 @@
 </head>
 <body>
 
-  <h1>💣 Questo Vicepreside si autodistruggerà in...</h1>
+  <h1>💣 Il Vicepreside<br><span style="font-size:0.9em;">si autodistruggerà in...</span></h1>
   <div id="timer">00:05</div>
 
   <div class="controls" id="controls"></div>
@@ -119,11 +129,12 @@
     <video id="video" src="video.mp4" preload="auto"></video>
   </div>
 
+  <audio id="boom" src="boom.mp3" preload="auto"></audio>
+
   <script>
     let duration = 5;
     let interval;
 
-    // Genera pulsanti (5s + ogni 30s fino a 300s)
     const controlsDiv = document.getElementById("controls");
     const times = [5, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
     times.forEach(t => {
@@ -152,6 +163,7 @@
       const startBtn = document.getElementById("startBtn");
       const face = document.getElementById("face");
       const video = document.getElementById("video");
+      const boom = document.getElementById("boom");
 
       controls.style.display = "none";
       startBtn.style.display = "none";
@@ -172,7 +184,9 @@
           clearInterval(interval);
           document.getElementById("timer").textContent = "00:00";
 
-          // Sovrappone il video alla foto
+          // Riproduce boom sonoro e avvia il video sovrapposto
+          boom.currentTime = 0;
+          boom.play().catch(() => {});
           video.style.display = "block";
           setTimeout(() => {
             video.style.opacity = "1";
