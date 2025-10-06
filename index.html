@@ -23,17 +23,17 @@
     }
 
     h1 {
-      font-size: 2em;
-      margin: 0 10px 10px;
-      line-height: 1.2;
-      text-shadow: 0 0 12px #00ffff;
+      font-size: 5em;  /* molto più grande */
+      margin: 0 10px 20px;
+      line-height: 1.1;
+      text-shadow: 0 0 25px #00ffff;
     }
 
     #timer {
-      font-size: 6em;
-      margin: 10px 0 30px;
+      font-size: 5em;
+      margin: 10px 0 40px;
       color: #00ffcc;
-      text-shadow: 0 0 20px #00ffcc;
+      text-shadow: 0 0 25px #00ffcc;
     }
 
     .controls {
@@ -41,18 +41,18 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      max-width: 320px;
+      max-width: 340px;
     }
 
     .controls button {
       background: #ff0040;
       border: none;
       color: white;
-      padding: 8px 12px;
-      font-size: 1em;
+      padding: 10px 14px;
+      font-size: 1.1em;
       margin: 4px;
       cursor: pointer;
-      border-radius: 8px;
+      border-radius: 10px;
       transition: transform 0.2s;
     }
 
@@ -64,9 +64,9 @@
       background: #0099ff;
       border: none;
       color: white;
-      padding: 10px 22px;
-      font-size: 1.2em;
-      border-radius: 10px;
+      padding: 12px 26px;
+      font-size: 1.4em;
+      border-radius: 12px;
       cursor: pointer;
       transition: transform 0.2s;
     }
@@ -75,28 +75,34 @@
       transform: scale(1.1);
     }
 
-    #face, #video {
+    /* Contenitore media sovrapposto */
+    #mediaContainer {
+      position: relative;
       width: 90%;
       max-width: 600px;
-      border-radius: 20px;
       margin-top: 30px;
+    }
+
+    #face, #video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
       box-shadow: 0 0 25px rgba(0,255,255,0.4);
       transition: opacity 1s ease;
-      position: relative;
     }
 
     #face {
       opacity: 0;
+      z-index: 1;
     }
 
     #video {
-      display: none;
       opacity: 0;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      z-index: 2;
+      display: none;
     }
   </style>
 </head>
@@ -117,7 +123,7 @@
     let duration = 5;
     let interval;
 
-    // Genera i pulsanti da 5s e poi ogni 30s fino a 300s
+    // Genera pulsanti (5s + ogni 30s fino a 300s)
     const controlsDiv = document.getElementById("controls");
     const times = [5, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300];
     times.forEach(t => {
@@ -149,8 +155,12 @@
 
       controls.style.display = "none";
       startBtn.style.display = "none";
+
       face.style.display = "block";
       face.style.opacity = "1";
+
+      video.pause();
+      video.currentTime = 0;
       video.style.display = "none";
       video.style.opacity = "0";
 
@@ -161,21 +171,18 @@
         if (remaining < 0) {
           clearInterval(interval);
           document.getElementById("timer").textContent = "00:00";
-          
-          // Dissolvenza immagine
-          face.style.opacity = "0";
-          
-          // Dopo 1 secondo: mostra e avvia video
+
+          // Sovrappone il video alla foto
+          video.style.display = "block";
           setTimeout(() => {
-            video.style.display = "block";
             video.style.opacity = "1";
             video.play();
-          }, 1000);
+          }, 100);
         }
       }, 1000);
     }
 
-    // Fullscreen su Android con tap
+    // Fullscreen tap (Android)
     document.body.addEventListener('click', () => {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
