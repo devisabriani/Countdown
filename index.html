@@ -21,7 +21,7 @@
       align-items: center;
     }
 
-    #centerBlock {
+    #main {
       text-align: center;
       width: 90%;
       max-width: 700px;
@@ -38,7 +38,6 @@
       line-height: 1.1;
       text-shadow: 0 0 25px #00ffff;
     }
-
     h1 span { font-size: 0.9em; }
 
     #timer {
@@ -52,45 +51,33 @@
       #timer { font-size: 4em; }
     }
 
-    /* Media (foto e video) */
-    #mediaContainer {
+    /* --- media --- */
+    #mediaBox {
       position: relative;
       width: 100%;
       max-width: 600px;
+      aspect-ratio: 16/9;
     }
-
     #face, #video {
       position: absolute;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: cover;
       border-radius: 20px;
       box-shadow: 0 0 25px rgba(0,255,255,0.4);
       transition: opacity 0.8s ease;
     }
+    #face { opacity: 0; display: none; z-index: 1; }
+    #video { opacity: 0; display: none; z-index: 2; }
 
-    #face {
-      opacity: 0;
-      display: none;
-      z-index: 1;
-    }
-
-    #video {
-      opacity: 0;
-      display: none;
-      z-index: 2;
-    }
-
-    /* Sezione iniziale (minutaggio + avvio) */
+    /* --- sezione iniziale --- */
     #controlsSection {
-      margin-top: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
     }
-
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -98,7 +85,6 @@
       gap: 8px;
       margin-bottom: 10px;
     }
-
     .controls button {
       background: #ff0040;
       border: none;
@@ -109,7 +95,6 @@
       border-radius: 10px;
       transition: transform 0.2s;
     }
-
     .controls button:hover { transform: scale(1.1); }
 
     #startBtn {
@@ -122,10 +107,9 @@
       cursor: pointer;
       transition: transform 0.2s;
     }
-
     #startBtn:hover { transform: scale(1.1); }
 
-    /* Pulsante restart */
+    /* --- restart --- */
     #restartBtn {
       position: fixed;
       bottom: 16px;
@@ -140,7 +124,6 @@
       display: none;
       transition: background 0.3s ease, transform 0.2s ease;
     }
-
     #restartBtn:hover {
       background: rgba(255,255,255,0.3);
       transform: scale(1.1);
@@ -148,12 +131,11 @@
   </style>
 </head>
 <body>
-
-  <div id="centerBlock">
+  <div id="main">
     <h1>💣 Il Vicepreside<br><span>si autodistruggerà in...</span></h1>
     <div id="timer">00:05</div>
 
-    <div id="mediaContainer">
+    <div id="mediaBox">
       <img id="face" src="face.png" alt="Il Vicepreside">
       <video id="video" src="video.mp4" preload="auto"></video>
     </div>
@@ -202,6 +184,7 @@
       const restartBtn = document.getElementById("restartBtn");
 
       controlsSection.style.display = "none";
+
       face.style.display = "block";
       face.style.opacity = "1";
       video.pause();
@@ -218,23 +201,21 @@
           clearInterval(interval);
           document.getElementById("timer").textContent = "00:00";
 
-          // effetto esplosione + dissolvenza immagine
           boom.currentTime = 0;
           boom.play().catch(() => {});
           face.style.opacity = "0";
 
-          // avvia il video solo dopo la dissolvenza completa
+          // avvia il video solo dopo che la foto è completamente svanita
           setTimeout(() => {
             face.style.display = "none";
             video.style.display = "block";
             video.style.opacity = "1";
             video.play();
 
-            // mostra il pulsante solo a fine video
             video.onended = () => {
               restartBtn.style.display = "block";
             };
-          }, 900);
+          }, 800);
         }
       }, 1000);
     }
@@ -249,11 +230,9 @@
       video.style.display = "none";
       face.style.display = "none";
       restartBtn.style.display = "none";
-
       controlsSection.style.display = "flex";
     }
 
-    // Fullscreen su Android
     document.body.addEventListener('click', () => {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen();
